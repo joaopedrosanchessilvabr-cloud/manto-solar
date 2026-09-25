@@ -435,6 +435,7 @@ h1,h2,h3{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing
     <p id="pixHelpText">Clique em "Gerar Pix" para criar seu código de pagamento.</p>
     <div class="copy-code" id="pixCode" hidden></div>
     <button type="button" class="btn-copy" id="copyPixBtn" hidden>Copiar código</button>
+    <a class="btn-copy" id="paidLink" href="#" hidden style="display:block;text-align:center;margin-top:8px;border-color:var(--gold);color:var(--gold-light);">Já fiz o pagamento →</a>
     <small class="field-error" id="pixError"></small>
   </div>
 
@@ -758,6 +759,15 @@ finalCta.addEventListener('click', async function(){
     pixCodeEl.hidden = false;
     copyPixBtn.hidden = false;
     pixHelpText.textContent = 'Escaneie o QR code com o app do seu banco ou copie o código abaixo. Assim que o pagamento for aprovado, você recebe a confirmação por e-mail.';
+
+    const paidLink = document.getElementById('paidLink');
+    const orderParams = new URLSearchParams({
+      size: size,
+      total: totalToPay,
+      order: data.external_id || data.internal_id || ''
+    });
+    paidLink.href = 'obrigado.html?' + orderParams.toString();
+    paidLink.hidden = false;
 
     finalCta.textContent = 'Pix gerado ✓';
     pixGenerated = true;
