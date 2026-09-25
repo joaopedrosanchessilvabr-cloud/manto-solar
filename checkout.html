@@ -76,6 +76,11 @@ h1,h2,h3{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing
 .stepper .step-label{font-size:10.5px;color:var(--ink-dim);text-transform:uppercase;letter-spacing:.03em;white-space:nowrap;}
 .stepper .step.active .step-label{color:var(--gold-light);}
 .stepper .step-line{flex:none;width:100%;height:1px;background:var(--line);margin:0 2px;}
+@media (max-width:360px){
+  .stepper{padding:16px 12px 6px;gap:2px;}
+  .stepper .step{gap:5px;}
+  .stepper .step-label{font-size:9px;}
+}
 
 /* ---------- Cart summary ---------- */
 .cart-summary{
@@ -231,7 +236,7 @@ h1,h2,h3{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing
 <div class="stepper" id="stepper">
   <div class="step active" data-step="1">
     <div class="step-num">1</div>
-    <div class="step-label">Identificação</div>
+    <div class="step-label">Dados</div>
   </div>
   <div class="step-line"></div>
   <div class="step" data-step="2">
