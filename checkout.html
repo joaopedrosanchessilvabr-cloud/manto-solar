@@ -61,7 +61,7 @@ h1,h2,h3{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing
   padding:18px 20px 6px;
   gap:6px;
 }
-.stepper .step{display:flex;align-items:center;gap:8px;flex:1;}
+.stepper .step{display:flex;align-items:center;gap:8px;flex:none;}
 .stepper .step-num{
   width:24px;height:24px;border-radius:50%;
   display:flex;align-items:center;justify-content:center;
@@ -75,7 +75,7 @@ h1,h2,h3{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing
 }
 .stepper .step-label{font-size:10.5px;color:var(--ink-dim);text-transform:uppercase;letter-spacing:.03em;white-space:nowrap;}
 .stepper .step.active .step-label{color:var(--gold-light);}
-.stepper .step-line{flex:none;width:100%;height:1px;background:var(--line);margin:0 2px;}
+.stepper .step-line{flex:1 1 auto;min-width:12px;height:1px;background:var(--line);margin:0 2px;}
 @media (max-width:360px){
   .stepper{padding:16px 12px 6px;gap:2px;}
   .stepper .step{gap:5px;}
