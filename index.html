@@ -355,15 +355,7 @@ footer .foot-cross::before,footer .foot-cross::after{content:'';position:absolut
 footer .foot-cross::before{width:16px;height:2px;top:7px;left:0;}
 footer .foot-cross::after{width:2px;height:16px;left:7px;top:0;}
 footer p{font-size:11.5px;color:var(--ink-dim);line-height:1.7;max-width:340px;margin:0 auto 10px;}
-footer .trust-badge-frame{
-  background:var(--bg-panel);
-  border:1px solid var(--gold-dim);
-  border-radius:10px;
-  padding:12px 16px;
-  max-width:260px;
-  margin:10px auto 16px;
-}
-footer .trust-badge{width:100%;display:block;border-radius:5px;}
+footer .trust-badge{width:auto;max-width:260px;margin:6px auto 16px;display:block;border-radius:6px;overflow:hidden;}
 footer .warn{color:#a08040;font-size:11px;}
 footer .pay-icons{display:flex;justify-content:center;gap:8px;margin:16px 0;flex-wrap:wrap;}
 footer .pay-icons span{
@@ -676,9 +668,7 @@ footer .pay-icons span{
 <footer>
   <div class="foot-cross"></div>
   <p>Compra 100% segura, com dados protegidos e checkout criptografado. Envio para todo o Brasil com rastreamento.</p>
-  <div class="trust-badge-frame">
-    <img src="images/trust-badge.png" alt="Mercado Pago - Compra 100% segura - Visa, Mastercard, Elo, Pix" class="trust-badge">
-  </div>
+  <img src="images/trust-badge.png" alt="Mercado Pago - Compra 100% segura - Visa, Mastercard, Elo, Pix" class="trust-badge">
   <p class="warn">Desconfie de preços muito baixos fora deste site — este é o canal oficial de vendas desta coleção.</p>
   <div class="pay-icons">
     <span>Pix</span><span>Cartão</span><span>Boleto</span>
