@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Checkout Seguro — Quem Me Protege Não Dorme</title>
+<meta name="description" content="Finalize sua compra com segurança. Frete grátis para todo o Brasil.">
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Cinzel:wght@500;600&display=swap');
+
+:root{
+  --bg:#0a0908;
+  --bg-panel:#141210;
+  --bg-panel-2:#1b1815;
+  --gold:#c9a24a;
+  --gold-light:#e8c979;
+  --gold-dim:#7a6636;
+  --ink:#f2ede4;
+  --ink-dim:#a9a099;
+  --line:#2b2620;
+  --danger:#8a2b2b;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:'Inter',sans-serif;
+  max-width:480px;
+  margin:0 auto;
+  position:relative;
+  overflow-x:hidden;
+  padding-bottom:40px;
+}
+img{width:100%;display:block;}
+h1,h2,h3{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.01em;}
+
+/* ---------- Header ---------- */
+.checkout-header{
+  display:flex;align-items:center;gap:12px;
+  padding:16px 20px;
+  border-bottom:1px solid var(--line);
+}
+.checkout-header a{
+  color:var(--ink-dim);text-decoration:none;font-size:18px;
+  width:32px;height:32px;display:flex;align-items:center;justify-content:center;
+  border:1px solid var(--line);border-radius:50%;flex:none;
+}
+.checkout-header .brand{flex:1;}
+.checkout-header strong{
+  display:block;font-family:'Oswald',sans-serif;font-size:14px;letter-spacing:.06em;
+  color:var(--ink);text-transform:uppercase;
+}
+.checkout-header small{display:block;font-size:11px;color:var(--ink-dim);margin-top:1px;}
+.checkout-header .lock{color:var(--gold);font-size:16px;flex:none;}
+
+/* ---------- Stepper ---------- */
+.stepper{
+  display:flex;align-items:center;justify-content:center;
+  padding:18px 20px 6px;
+  gap:6px;
+}
+.stepper .step{display:flex;align-items:center;gap:8px;flex:1;}
+.stepper .step-num{
+  width:24px;height:24px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Oswald',sans-serif;font-size:12px;font-weight:600;
+  border:1px solid var(--line);color:var(--ink-dim);background:var(--bg-panel);
+  flex:none;
+}
+.stepper .step.active .step-num,
+.stepper .step.done .step-num{
+  background:var(--gold);border-color:var(--gold);color:#1a1408;
+}
+.stepper .step-label{font-size:10.5px;color:var(--ink-dim);text-transform:uppercase;letter-spacing:.03em;white-space:nowrap;}
+.stepper .step.active .step-label{color:var(--gold-light);}
+.stepper .step-line{flex:none;width:100%;height:1px;background:var(--line);margin:0 2px;}
+
+/* ---------- Cart summary ---------- */
+.cart-summary{
+  margin:10px 20px 0;
+  background:var(--bg-panel);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:14px;
+  display:flex;
+  gap:12px;
+  align-items:center;
+}
+.cart-summary img{width:56px;height:56px;object-fit:cover;border-radius:6px;border:1px solid var(--line);flex:none;}
+.cart-summary-info{flex:1;}
+.cart-summary-info strong{display:block;font-size:13px;color:var(--ink);font-weight:600;}
+.cart-summary-info small{display:block;font-size:11.5px;color:var(--ink-dim);margin-top:2px;}
+.cart-summary-price{text-align:right;flex:none;}
+.cart-summary-price b{font-family:'Oswald',sans-serif;font-size:16px;color:var(--gold-light);}
+
+/* ---------- Card / form ---------- */
+.checkout-card{
+  margin:16px 20px 0;
+}
+.eyebrow-step{
+  font-family:'Cinzel',serif;letter-spacing:.14em;text-transform:uppercase;
+  font-size:11px;color:var(--gold);margin-bottom:6px;
+}
+.checkout-card h1{font-size:21px;color:var(--ink);margin-bottom:6px;}
+.checkout-intro{font-size:13px;color:var(--ink-dim);line-height:1.55;margin-bottom:18px;}
+
+.field{display:block;margin-bottom:14px;}
+.field span{
+  display:block;font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:.05em;
+  text-transform:uppercase;color:var(--ink-dim);margin-bottom:7px;
+}
+.field input{
+  width:100%;background:var(--bg-panel-2);border:1px solid var(--line);border-radius:5px;
+  padding:12px 12px;color:var(--ink);font-family:'Inter',sans-serif;font-size:14px;
+  outline:none;
+}
+.field input:focus{border-color:var(--gold-dim);}
+.field input.invalid{border-color:var(--danger);}
+.field-error{display:block;margin-top:5px;font-size:11px;color:#c9615f;}
+.field-hint{display:block;margin-top:6px;font-size:11px;color:var(--ink-dim);min-height:14px;}
+.field-hint.ok{color:var(--gold-light);}
+.field-hint.error{color:#c9615f;}
+.field input:disabled{opacity:.6;}
+.field-note{font-size:11.5px;color:var(--ink-dim);line-height:1.5;margin:-4px 0 18px;}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.field-row.small-first{grid-template-columns:.8fr 1.2fr;}
+
+/* ---------- Shipping options ---------- */
+.shipping-card{margin-top:6px;margin-bottom:18px;}
+.shipping-card-title{
+  font-family:'Oswald',sans-serif;font-size:11.5px;letter-spacing:.05em;
+  text-transform:uppercase;color:var(--ink-dim);margin-bottom:10px;
+}
+.shipping-options{display:flex;flex-direction:column;gap:8px;}
+.shipping-option{
+  display:flex;align-items:center;gap:12px;
+  background:var(--bg-panel-2);border:1px solid var(--line);border-radius:6px;
+  padding:12px 14px;cursor:pointer;
+}
+.shipping-option.selected{border-color:var(--gold);background:rgba(201,162,74,.07);}
+.shipping-option input{accent-color:var(--gold);width:16px;height:16px;flex:none;}
+.shipping-option-info{flex:1;}
+.shipping-option-label{display:block;font-size:13.5px;color:var(--ink);font-weight:600;}
+.shipping-option-info small{display:block;font-size:11.5px;color:var(--ink-dim);margin-top:2px;}
+.shipping-option b{font-family:'Oswald',sans-serif;font-size:13px;color:var(--ink-dim);}
+.shipping-option b.gold{color:var(--gold-light);}
+
+/* ---------- Payment options ---------- */
+.payment-options{display:flex;flex-direction:column;gap:8px;margin-bottom:18px;}
+.payment-option{
+  display:flex;align-items:center;gap:12px;width:100%;
+  background:var(--bg-panel-2);border:1px solid var(--line);border-radius:6px;
+  padding:14px;cursor:pointer;text-align:left;font-family:inherit;color:inherit;
+}
+.payment-option.selected{border-color:var(--gold);background:rgba(201,162,74,.07);}
+.payment-option .icon{
+  width:32px;height:32px;border-radius:6px;background:var(--bg-panel);
+  border:1px solid var(--line);display:flex;align-items:center;justify-content:center;
+  font-size:15px;color:var(--gold);flex:none;
+}
+.payment-option div{flex:1;}
+.payment-option strong{display:block;font-size:13.5px;color:var(--ink);}
+.payment-option small{display:block;font-size:11px;color:var(--ink-dim);margin-top:1px;}
+.payment-option b{font-family:'Oswald',sans-serif;font-size:13px;color:var(--ink-dim);flex:none;}
+
+.pix-box{
+  text-align:center;background:var(--bg-panel);border:1px solid var(--gold-dim);
+  border-radius:8px;padding:22px 18px;margin-bottom:18px;
+}
+.pix-box .qr{
+  width:160px;height:160px;margin:0 auto 14px;background:var(--bg-panel-2);
+  border:1px solid var(--line);border-radius:6px;
+  display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--ink-dim);
+}
+.pix-box p{font-size:12.5px;color:var(--ink-dim);line-height:1.6;}
+.pix-box .copy-code{
+  margin-top:12px;font-size:11px;color:var(--gold-light);border:1px solid var(--line);
+  border-radius:5px;padding:8px;word-break:break-all;background:var(--bg-panel-2);
+}
+
+/* ---------- Summary box ---------- */
+.checkout-summary{
+  border-top:1px solid var(--line);padding-top:14px;margin-bottom:18px;
+}
+.checkout-summary div{display:flex;justify-content:space-between;font-size:12.5px;color:var(--ink-dim);margin-bottom:8px;}
+.checkout-summary div strong{color:var(--ink);font-weight:500;}
+.checkout-summary div.total{margin-top:4px;padding-top:10px;border-top:1px solid var(--line);}
+.checkout-summary div.total span{font-size:13.5px;color:var(--ink);font-weight:600;}
+.checkout-summary div.total strong{font-family:'Oswald',sans-serif;font-size:20px;color:var(--gold-light);}
+.gold{color:var(--gold-light)!important;}
+
+/* ---------- Actions / buttons ---------- */
+.checkout-actions{display:flex;gap:10px;margin-top:4px;}
+.btn-primary{
+  flex:1;display:block;background:#D9A441;color:#1a1408;
+  font-family:'Oswald',sans-serif;font-weight:600;font-size:14.5px;letter-spacing:.03em;
+  text-transform:uppercase;text-align:center;text-decoration:none;
+  padding:15px 18px;border-radius:4px;border:none;cursor:pointer;
+  box-shadow:0 10px 26px -10px rgba(217,164,65,.55);
+}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;box-shadow:none;}
+.btn-back{
+  flex:none;background:transparent;border:1px solid var(--line);color:var(--ink-dim);
+  font-family:'Oswald',sans-serif;font-weight:500;font-size:13px;text-transform:uppercase;
+  letter-spacing:.03em;padding:15px 16px;border-radius:4px;cursor:pointer;
+}
+
+.checkout-trust{
+  text-align:center;padding:26px 20px 10px;
+}
+.checkout-trust p{font-size:11.5px;color:var(--ink-dim);margin-bottom:6px;}
+.checkout-trust .fine{font-size:10.5px;color:var(--ink-dim);opacity:.8;}
+.pay-icons{display:flex;justify-content:center;gap:8px;margin:14px 0 4px;flex-wrap:wrap;}
+.pay-icons span{font-size:10px;color:var(--ink-dim);border:1px solid var(--line);border-radius:4px;padding:4px 8px;}
+.checkout-trust .trust-badge{width:auto;max-width:260px;margin:14px auto 0;display:block;border-radius:6px;overflow:hidden;}
+</style>
+</head>
+<body>
+
+<header class="checkout-header">
+  <a href="index.html" aria-label="Voltar para a página do produto">←</a>
+  <div class="brand">
+    <strong>Manto Solar</strong>
+    <small>Checkout seguro</small>
+  </div>
+  <span class="lock">🔒</span>
+</header>
+
+<div class="stepper" id="stepper">
+  <div class="step active" data-step="1">
+    <div class="step-num">1</div>
+    <div class="step-label">Identificação</div>
+  </div>
+  <div class="step-line"></div>
+  <div class="step" data-step="2">
+    <div class="step-num">2</div>
+    <div class="step-label">Entrega</div>
+  </div>
+  <div class="step-line"></div>
+  <div class="step" data-step="3">
+    <div class="step-num">3</div>
+    <div class="step-label">Pagamento</div>
+  </div>
+</div>
+
+<div class="cart-summary">
+  <img src="images/img3.jpg" alt="Camisa UV 50+ Quem Me Protege Não Dorme">
+  <div class="cart-summary-info">
+    <strong>Camisa UV 50+ Quem Me Protege Não Dorme</strong>
+    <small id="cartSizeLabel">Tamanho: G</small>
+    <small>Quantidade: 1</small>
+  </div>
+  <div class="cart-summary-price">
+    <b id="cartPrice">R$ 54,90</b>
+  </div>
+</div>
+
+<!-- ============= STEP 1 — IDENTIFICAÇÃO ============= -->
+<form class="checkout-card" id="step1" novalidate>
+  <p class="eyebrow-step">Etapa 1 de 3</p>
+  <h1>Seus dados</h1>
+  <p class="checkout-intro">Usaremos seus dados apenas para identificar você e manter o seu pedido atualizado.</p>
+
+  <label class="field">
+    <span>Nome completo</span>
+    <input id="f-name" autocomplete="name" required>
+    <small class="field-error" id="err-name"></small>
+  </label>
+  <label class="field">
+    <span>E-mail</span>
+    <input id="f-email" type="email" autocomplete="email" required>
+    <small class="field-error" id="err-email"></small>
+  </label>
+  <div class="field-row">
+    <label class="field">
+      <span>Celular</span>
+      <input id="f-phone" type="tel" inputmode="numeric" autocomplete="tel" maxlength="15" placeholder="(00) 00000-0000" required>
+      <small class="field-error" id="err-phone"></small>
+    </label>
+    <label class="field">
+      <span>CPF</span>
+      <input id="f-cpf" inputmode="numeric" maxlength="14" placeholder="000.000.000-00" required>
+      <small class="field-error" id="err-cpf"></small>
+    </label>
+  </div>
+  <p class="field-note">Pedimos seu CPF porque ele é exigido para emitir a nota fiscal e para a etiqueta de transporte do seu pedido.</p>
+
+  <div class="checkout-actions">
+    <button type="submit" class="btn-primary">Continuar</button>
+  </div>
+</form>
+
+<!-- ============= STEP 2 — ENTREGA ============= -->
+<form class="checkout-card" id="step2" novalidate style="display:none;">
+  <p class="eyebrow-step">Etapa 2 de 3</p>
+  <h1>Onde entregar?</h1>
+  <p class="checkout-intro">Digite seu CEP para calcularmos o frete automaticamente.</p>
+
+  <label class="field">
+    <span>CEP</span>
+    <input id="f-cep" inputmode="numeric" maxlength="9" autocomplete="postal-code" required>
+    <small class="field-error" id="err-cep"></small>
+    <small class="field-hint" id="cepStatus"></small>
+  </label>
+  <label class="field">
+    <span>Endereço</span>
+    <input id="f-address" autocomplete="address-line1" required>
+    <small class="field-error" id="err-address"></small>
+  </label>
+  <div class="field-row small-first">
+    <label class="field">
+      <span>Número</span>
+      <input id="f-number" required>
+      <small class="field-error" id="err-number"></small>
+    </label>
+    <label class="field"><span>Complemento (opcional)</span><input id="f-complement" autocomplete="address-line2"></label>
+  </div>
+  <label class="field">
+    <span>Bairro</span>
+    <input id="f-neighborhood" required>
+    <small class="field-error" id="err-neighborhood"></small>
+  </label>
+  <div class="field-row">
+    <label class="field">
+      <span>Cidade</span>
+      <input id="f-city" autocomplete="address-level2" required>
+      <small class="field-error" id="err-city"></small>
+    </label>
+    <label class="field">
+      <span>UF</span>
+      <input id="f-state" maxlength="2" autocomplete="address-level1" required>
+      <small class="field-error" id="err-state"></small>
+    </label>
+  </div>
+
+  <div class="shipping-card">
+    <p class="shipping-card-title">🚚 Escolha a forma de envio</p>
+    <div class="shipping-options" id="shippingOptions">
+      <label class="shipping-option selected">
+        <input type="radio" name="shipping" value="0" checked>
+        <span class="shipping-option-info">
+          <strong class="shipping-option-label">Frete Grátis</strong>
+          <small>5 a 10 dias úteis · com rastreio</small>
+        </span>
+        <b class="gold">Grátis</b>
+      </label>
+      <label class="shipping-option">
+        <input type="radio" name="shipping" value="19.9">
+        <span class="shipping-option-info">
+          <strong class="shipping-option-label">SEDEX Expresso</strong>
+          <small>2 a 4 dias úteis · com rastreio</small>
+        </span>
+        <b>R$ 19,90</b>
+      </label>
+    </div>
+  </div>
+
+  <div class="checkout-actions">
+    <button type="button" class="btn-back" onclick="goToStep(1)">Voltar</button>
+    <button type="submit" class="btn-primary">Continuar</button>
+  </div>
+</form>
+
+<!-- ============= STEP 3 — PAGAMENTO ============= -->
+<form class="checkout-card" id="step3" novalidate style="display:none;">
+  <p class="eyebrow-step">Etapa 3 de 3</p>
+  <h1>Pagamento</h1>
+  <p class="checkout-intro" id="paymentIntro">Um QR code Pix será gerado aqui mesmo, sem sair desta página.</p>
+
+  <div class="payment-options" id="paymentOptions">
+    <button type="button" class="payment-option selected" data-method="pix">
+      <span class="icon">✚</span>
+      <div><strong>Pix</strong><small>Aprovação rápida · 5% OFF</small></div>
+      <b id="pixTotalLabel">R$ 52,16</b>
+    </button>
+    <button type="button" class="payment-option" data-method="card">
+      <span class="icon">▣</span>
+      <div><strong>Cartão de crédito</strong><small>Parcelamento no ambiente seguro</small></div>
+      <b id="cardTotalLabel">R$ 54,90</b>
+    </button>
+  </div>
+
+  <div class="pix-box" id="pixBox">
+    <div class="qr">QR Code Pix</div>
+    <p>Escaneie o QR code com o app do seu banco ou copie o código abaixo para pagar.</p>
+    <div class="copy-code" id="pixCode">00020126580014BR.GOV.BCB.PIX...MANTOSOLAR</div>
+  </div>
+
+  <div class="checkout-summary">
+    <div><span>Subtotal</span><strong id="sumSubtotal">R$ 54,90</strong></div>
+    <div><span>Frete</span><strong class="gold" id="sumShipping">Grátis</strong></div>
+    <div class="total"><span>Total</span><strong id="sumTotal">R$ 52,16</strong></div>
+  </div>
+
+  <div class="checkout-actions">
+    <button type="button" class="btn-back" onclick="goToStep(2)">Voltar</button>
+    <button type="button" class="btn-primary" id="finalCta">Gerar Pix</button>
+  </div>
+</form>
+
+<div class="checkout-trust">
+  <p>🔒 Compra 100% segura · 🚚 Frete grátis · 💳 Pix e cartão</p>
+  <p class="fine">Seus dados protegidos · Checkout criptografado</p>
+  <img src="images/trust-badge.png" alt="Mercado Pago - Compra 100% segura - Visa, Mastercard, Elo, Pix" class="trust-badge">
+</div>
+
+<script>
+const params = new URLSearchParams(location.search);
+const size = params.get('size') || 'G';
+const basePrice = parseFloat(params.get('price') || '54.90');
+const pixPrice = +(basePrice * 0.95).toFixed(2);
+let shippingCost = 0;
+
+document.getElementById('cartSizeLabel').textContent = 'Tamanho: ' + size;
+function fmt(v){ return 'R$ ' + v.toFixed(2).replace('.', ','); }
+document.getElementById('cartPrice').textContent = fmt(basePrice);
+document.getElementById('pixTotalLabel').textContent = fmt(pixPrice);
+document.getElementById('cardTotalLabel').textContent = fmt(basePrice);
+
+function goToStep(n){
+  [1,2,3].forEach(i=>{
+    document.getElementById('step'+i).style.display = (i===n) ? 'block' : 'none';
+  });
+  document.querySelectorAll('.stepper .step').forEach(el=>{
+    const s = parseInt(el.dataset.step);
+    el.classList.remove('active','done');
+    if(s === n) el.classList.add('active');
+    else if(s < n) el.classList.add('done');
+  });
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+// ============================================================
+// Máscaras automáticas — Celular e CPF
+// ============================================================
+document.getElementById('f-phone').addEventListener('input', function(){
+  let d = this.value.replace(/\D/g, '').slice(0, 11);
+  if(d.length > 10){
+    // (00) 00000-0000
+    this.value = d.replace(/^(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3').trim();
+  } else if(d.length > 5){
+    // (00) 0000-0000
+    this.value = d.replace(/^(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3').trim();
+  } else if(d.length > 2){
+    this.value = d.replace(/^(\d{2})(\d{0,5})/, '($1) $2').trim();
+  } else if(d.length > 0){
+    this.value = d.replace(/^(\d{0,2})/, '($1').trim();
+  } else {
+    this.value = '';
+  }
+});
+
+document.getElementById('f-cpf').addEventListener('input', function(){
+  let d = this.value.replace(/\D/g, '').slice(0, 11);
+  d = d.replace(/(\d{3})(\d)/, '$1.$2');
+  d = d.replace(/(\d{3})(\d)/, '$1.$2');
+  d = d.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+  this.value = d;
+});
+
+// ============================================================
+// Validação de campos
+// ============================================================
+function setFieldError(inputId, errorId, message){
+  const input = document.getElementById(inputId);
+  const err = document.getElementById(errorId);
+  if(message){
+    input.classList.add('invalid');
+    err.textContent = message;
+    return false;
+  } else {
+    input.classList.remove('invalid');
+    err.textContent = '';
+    return true;
+  }
+}
+
+function focusFirstInvalid(form){
+  const firstInvalid = form.querySelector('.invalid');
+  if(firstInvalid) firstInvalid.focus();
+}
+
+// limpa o erro assim que a pessoa começa a corrigir o campo
+document.querySelectorAll('#step1 input[required], #step2 input[required]').forEach(function(input){
+  input.addEventListener('input', function(){
+    input.classList.remove('invalid');
+    const err = document.getElementById('err-' + input.id.replace('f-', ''));
+    if(err) err.textContent = '';
+  });
+});
+
+function validateStep1(){
+  let ok = true;
+  const name = document.getElementById('f-name').value.trim();
+  const email = document.getElementById('f-email').value.trim();
+  const phone = document.getElementById('f-phone').value.replace(/\D/g,'');
+  const cpf = document.getElementById('f-cpf').value.replace(/\D/g,'');
+
+  ok = setFieldError('f-name', 'err-name',
+    name.length < 3 || !name.includes(' ') ? 'Digite seu nome completo.' : '') && ok;
+
+  ok = setFieldError('f-email', 'err-email',
+    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? 'Digite um e-mail válido.' : '') && ok;
+
+  ok = setFieldError('f-phone', 'err-phone',
+    phone.length < 10 ? 'Digite um celular válido com DDD.' : '') && ok;
+
+  ok = setFieldError('f-cpf', 'err-cpf',
+    cpf.length !== 11 ? 'Digite um CPF válido (11 dígitos).' : '') && ok;
+
+  return ok;
+}
+
+function validateStep2(){
+  let ok = true;
+  const cepDigits = document.getElementById('f-cep').value.replace(/\D/g,'');
+  const address = document.getElementById('f-address').value.trim();
+  const number = document.getElementById('f-number').value.trim();
+  const neighborhood = document.getElementById('f-neighborhood').value.trim();
+  const city = document.getElementById('f-city').value.trim();
+  const state = document.getElementById('f-state').value.trim();
+
+  ok = setFieldError('f-cep', 'err-cep', cepDigits.length !== 8 ? 'Digite um CEP válido.' : '') && ok;
+  ok = setFieldError('f-address', 'err-address', !address ? 'Preencha o endereço.' : '') && ok;
+  ok = setFieldError('f-number', 'err-number', !number ? 'Preencha o número.' : '') && ok;
+  ok = setFieldError('f-neighborhood', 'err-neighborhood', !neighborhood ? 'Preencha o bairro.' : '') && ok;
+  ok = setFieldError('f-city', 'err-city', !city ? 'Preencha a cidade.' : '') && ok;
+  ok = setFieldError('f-state', 'err-state', state.length !== 2 ? 'UF inválida.' : '') && ok;
+
+  return ok;
+}
+
+document.getElementById('step1').addEventListener('submit', function(e){
+  e.preventDefault();
+  if(validateStep1()){
+    goToStep(2);
+  } else {
+    focusFirstInvalid(this);
+  }
+});
+
+// ============================================================
+// CEP — busca automática de endereço (ViaCEP)
+// ============================================================
+const cepInput = document.getElementById('f-cep');
+const cepStatus = document.getElementById('cepStatus');
+const addressFields = ['f-address','f-neighborhood','f-city','f-state'].map(id => document.getElementById(id));
+let lastCepQueried = '';
+
+cepInput.addEventListener('input', function(){
+  let digits = cepInput.value.replace(/\D/g, '').slice(0, 8);
+  cepInput.value = digits.length > 5 ? digits.slice(0,5) + '-' + digits.slice(5) : digits;
+  if(digits.length < 8){
+    cepStatus.textContent = '';
+    cepStatus.className = 'field-hint';
+    return;
+  }
+  buscarCep(digits);
+});
+
+async function buscarCep(cep){
+  if(cep === lastCepQueried) return;
+  lastCepQueried = cep;
+  cepStatus.textContent = 'Buscando endereço...';
+  cepStatus.className = 'field-hint';
+  addressFields.forEach(el => el.disabled = true);
+  try{
+    const res = await fetch('https://viacep.com.br/ws/' + cep + '/json/');
+    const data = await res.json();
+    if(data.erro){
+      cepStatus.textContent = 'CEP não encontrado. Preencha o endereço manualmente.';
+      cepStatus.className = 'field-hint error';
+    } else {
+      document.getElementById('f-address').value = data.logradouro || '';
+      document.getElementById('f-neighborhood').value = data.bairro || '';
+      document.getElementById('f-city').value = data.localidade || '';
+      document.getElementById('f-state').value = data.uf || '';
+      cepStatus.textContent = '✓ Endereço encontrado';
+      cepStatus.className = 'field-hint ok';
+      document.getElementById('f-number').focus();
+    }
+  } catch(err){
+    cepStatus.textContent = 'Não foi possível buscar o CEP agora. Preencha manualmente.';
+    cepStatus.className = 'field-hint error';
+  } finally {
+    addressFields.forEach(el => el.disabled = false);
+  }
+}
+
+document.querySelectorAll('#shippingOptions .shipping-option').forEach(function(opt){
+  opt.addEventListener('click', function(){
+    document.querySelectorAll('#shippingOptions .shipping-option').forEach(o=>o.classList.remove('selected'));
+    opt.classList.add('selected');
+    opt.querySelector('input').checked = true;
+    shippingCost = parseFloat(opt.querySelector('input').value);
+    updateSummary();
+  });
+});
+
+document.getElementById('step2').addEventListener('submit', function(e){
+  e.preventDefault();
+  if(validateStep2()){
+    updateSummary();
+    goToStep(3);
+  } else {
+    focusFirstInvalid(this);
+  }
+});
+
+let selectedMethod = 'pix';
+document.querySelectorAll('#paymentOptions .payment-option').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    document.querySelectorAll('#paymentOptions .payment-option').forEach(b=>b.classList.remove('selected'));
+    btn.classList.add('selected');
+    selectedMethod = btn.dataset.method;
+    document.getElementById('pixBox').style.display = selectedMethod === 'pix' ? 'block' : 'none';
+    document.getElementById('paymentIntro').textContent = selectedMethod === 'pix'
+      ? 'Um QR code Pix será gerado aqui mesmo, sem sair desta página.'
+      : 'Você será direcionado ao ambiente protegido para concluir o pagamento com cartão.';
+    document.getElementById('finalCta').textContent = selectedMethod === 'pix' ? 'Gerar Pix' : 'Ir para pagamento';
+    updateSummary();
+  });
+});
+
+function updateSummary(){
+  const productTotal = selectedMethod === 'pix' ? pixPrice : basePrice;
+  document.getElementById('sumSubtotal').textContent = fmt(productTotal);
+  document.getElementById('sumShipping').textContent = shippingCost === 0 ? 'Grátis' : fmt(shippingCost);
+  document.getElementById('sumTotal').textContent = fmt(productTotal + shippingCost);
+}
+updateSummary();
+</script>
+
+</body></html>
