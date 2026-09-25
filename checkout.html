@@ -213,6 +213,16 @@ h1,h2,h3{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing
 }
 .btn-copy.copied{border-color:var(--gold);background:rgba(201,162,74,.1);}
 .pix-box .field-error{margin-top:10px;}
+.pix-waiting{
+  margin-top:12px;display:flex;align-items:center;justify-content:center;gap:9px;
+  font-size:12px;color:var(--gold-light);
+}
+.pix-spinner{
+  width:14px;height:14px;border-radius:50%;flex:none;
+  border:2px solid var(--gold-dim);border-top-color:var(--gold-light);
+  animation:pix-spin .8s linear infinite;
+}
+@keyframes pix-spin{to{transform:rotate(360deg);}}
 
 /* ---------- Summary box ---------- */
 .checkout-summary{
@@ -435,7 +445,10 @@ h1,h2,h3{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing
     <p id="pixHelpText">Clique em "Gerar Pix" para criar seu código de pagamento.</p>
     <div class="copy-code" id="pixCode" hidden></div>
     <button type="button" class="btn-copy" id="copyPixBtn" hidden>Copiar código</button>
-    <a class="btn-copy" id="paidLink" href="#" hidden style="display:block;text-align:center;margin-top:8px;border-color:var(--gold);color:var(--gold-light);">Já fiz o pagamento →</a>
+    <div class="pix-waiting" id="pixWaiting" hidden>
+      <span class="pix-spinner"></span>
+      <span>Aguardando a confirmação do pagamento...</span>
+    </div>
     <small class="field-error" id="pixError"></small>
   </div>
 
@@ -758,25 +771,65 @@ finalCta.addEventListener('click', async function(){
     pixCodeEl.textContent = data.qrcode;
     pixCodeEl.hidden = false;
     copyPixBtn.hidden = false;
-    pixHelpText.textContent = 'Escaneie o QR code com o app do seu banco ou copie o código abaixo. Assim que o pagamento for aprovado, você recebe a confirmação por e-mail.';
+    pixHelpText.textContent = 'Escaneie o QR code com o app do seu banco ou copie o código abaixo. Assim que o pagamento for aprovado, esta página avança sozinha.';
 
-    const paidLink = document.getElementById('paidLink');
-    const orderParams = new URLSearchParams({
+    finalCta.textContent = 'Pix gerado ✓';
+    pixGenerated = true;
+
+    startPixStatusPolling(data.internal_id, {
       size: size,
       total: totalToPay,
       order: data.external_id || data.internal_id || ''
     });
-    paidLink.href = 'obrigado.html?' + orderParams.toString();
-    paidLink.hidden = false;
-
-    finalCta.textContent = 'Pix gerado ✓';
-    pixGenerated = true;
   }catch(err){
     pixError.textContent = 'Erro ao conectar com o gateway de pagamento. Verifique sua internet e tente novamente.';
     finalCta.disabled = false;
     finalCta.textContent = 'Gerar Pix';
   }
 });
+
+// ============================================================
+// Verificação automática do pagamento — assim que o Pix é aprovado,
+// a página segue sozinha para a tela de agradecimento.
+// ============================================================
+const pixWaiting = document.getElementById('pixWaiting');
+const PAID_STATUSES = ['paid', 'approved', 'completed', 'confirmed'];
+const CANCELLED_STATUSES = ['cancelled', 'canceled', 'expired', 'failed'];
+
+function startPixStatusPolling(internalId, orderInfo){
+  if(!internalId) return;
+  pixWaiting.hidden = false;
+
+  const POLL_INTERVAL_MS = 4000;
+  const MAX_DURATION_MS = 15 * 60 * 1000; // desiste de checar sozinho após 15 min
+  const startedAt = Date.now();
+
+  const timer = setInterval(async function(){
+    if(Date.now() - startedAt > MAX_DURATION_MS){
+      clearInterval(timer);
+      pixWaiting.hidden = true;
+      return;
+    }
+    try{
+      const resp = await fetch('/api/check-pix-status?id=' + encodeURIComponent(internalId));
+      if(!resp.ok) return; // tenta de novo no próximo ciclo
+      const data = await resp.json();
+      const status = (data.status || '').toLowerCase();
+
+      if(PAID_STATUSES.includes(status)){
+        clearInterval(timer);
+        const orderParams = new URLSearchParams(orderInfo);
+        window.location.href = 'obrigado.html?' + orderParams.toString();
+      } else if(CANCELLED_STATUSES.includes(status)){
+        clearInterval(timer);
+        pixWaiting.hidden = true;
+        pixError.textContent = 'Este Pix não foi confirmado (cancelado ou expirado). Gere um novo código para tentar novamente.';
+      }
+    }catch(pollErr){
+      // falha de rede pontual — tenta de novo no próximo ciclo
+    }
+  }, POLL_INTERVAL_MS);
+}
 
 copyPixBtn.addEventListener('click', function(){
   navigator.clipboard.writeText(pixCodeEl.textContent).then(function(){
