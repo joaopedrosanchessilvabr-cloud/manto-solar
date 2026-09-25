@@ -1,21 +1,35 @@
 # Manto Solar — Camisa UV 50+
 
-Site estático (HTML/CSS/JS puro, sem build) da landing page e checkout da camisa "Quem Me Protege Não Dorme".
+Site (HTML/CSS/JS + 2 funções serverless) da landing page e checkout da camisa "Quem Me Protege Não Dorme".
 
 ## Estrutura
 
 - `index.html` — landing page do produto
 - `checkout.html` — checkout em 3 etapas (Identificação → Entrega → Pagamento)
-- `images/` — fotos do produto e selo de segurança
+- `images/` — fotos do produto, selos de segurança e logos das transportadoras
+- `api/create-pix.js` — função serverless que gera o depósito Pix real na SimplifyBR
+- `api/simplify-webhook.js` — recebe as notificações de status de pagamento da SimplifyBR
 
 ## Deploy
 
-Este projeto não precisa de build. Basta importar o repositório na [Vercel](https://vercel.com/new) — ela detecta e publica os arquivos estáticos automaticamente.
+Publicado em: **https://manto-solar.vercel.app**
 
-Após o primeiro deploy, qualquer `git push` para a branch principal atualiza o site publicado automaticamente.
+O projeto está importado na Vercel a partir deste repositório GitHub. Qualquer `git push` para a branch `main` atualiza o site publicado automaticamente (não precisa subir nada manualmente).
+
+## Pagamento (SimplifyBR)
+
+O checkout gera cobranças Pix reais através da API da SimplifyBR. Para isso funcionar, configure na Vercel (**Project → Settings → Environment Variables**):
+
+- `SIMPLIFY_CLIENT_ID` — Client-id gerado em simplifybr.com → Integrações → API
+- `SIMPLIFY_CLIENT_SECRET` — Client-secret gerado no mesmo lugar
+- `SIMPLIFY_WEBHOOK_URL` (opcional) — normalmente `https://manto-solar.vercel.app/api/simplify-webhook`
+
+⚠️ Essas chaves nunca devem ser coladas no código nem commitadas no repositório (que é público) — elas ficam só nas variáveis de ambiente da Vercel.
+
+Pagamento por cartão ainda está desativado no checkout ("Em breve") até a integração de cartão ser configurada.
 
 ## Domínio
 
-Ainda não há domínio próprio configurado — o site fica acessível pela URL `*.vercel.app` gerada no primeiro deploy. Depois de decidir o domínio final, atualize:
+O site usa por enquanto o domínio gratuito `manto-solar.vercel.app`. Ao decidir um domínio próprio (ex: `mantosolar.com.br`), atualize:
 - `<link rel="canonical">` e `<meta property="og:url">` no `index.html`
-- O domínio pode ser adicionado em **Vercel → Project → Settings → Domains**
+- Adicione o domínio em **Vercel → Project → Settings → Domains**

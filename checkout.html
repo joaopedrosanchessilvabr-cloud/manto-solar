@@ -194,15 +194,24 @@ h1,h2,h3{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing
   border-radius:8px;padding:22px 18px;margin-bottom:18px;
 }
 .pix-box .qr{
-  width:160px;height:160px;margin:0 auto 14px;background:var(--bg-panel-2);
+  width:180px;height:180px;margin:0 auto 14px;background:var(--bg-panel-2);
   border:1px solid var(--line);border-radius:6px;
   display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--ink-dim);
+  padding:8px;
 }
+.pix-box .qr canvas{width:100%!important;height:100%!important;border-radius:3px;}
 .pix-box p{font-size:12.5px;color:var(--ink-dim);line-height:1.6;}
 .pix-box .copy-code{
   margin-top:12px;font-size:11px;color:var(--gold-light);border:1px solid var(--line);
   border-radius:5px;padding:8px;word-break:break-all;background:var(--bg-panel-2);
 }
+.btn-copy{
+  margin-top:10px;width:100%;background:transparent;border:1px solid var(--gold-dim);
+  color:var(--gold-light);font-family:'Oswald',sans-serif;font-weight:500;font-size:12.5px;
+  text-transform:uppercase;letter-spacing:.03em;padding:10px;border-radius:5px;cursor:pointer;
+}
+.btn-copy.copied{border-color:var(--gold);background:rgba(201,162,74,.1);}
+.pix-box .field-error{margin-top:10px;}
 
 /* ---------- Summary box ---------- */
 .checkout-summary{
@@ -421,9 +430,11 @@ h1,h2,h3{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing
   </div>
 
   <div class="pix-box" id="pixBox">
-    <div class="qr">QR Code Pix</div>
-    <p>Escaneie o QR code com o app do seu banco ou copie o código abaixo para pagar.</p>
-    <div class="copy-code" id="pixCode">00020126580014BR.GOV.BCB.PIX...MANTOSOLAR</div>
+    <div class="qr" id="pixQrWrap"><span id="pixQrPlaceholder">Seu QR code vai aparecer aqui</span></div>
+    <p id="pixHelpText">Clique em "Gerar Pix" para criar seu código de pagamento.</p>
+    <div class="copy-code" id="pixCode" hidden></div>
+    <button type="button" class="btn-copy" id="copyPixBtn" hidden>Copiar código</button>
+    <small class="field-error" id="pixError"></small>
   </div>
 
   <div class="checkout-summary">
@@ -444,6 +455,7 @@ h1,h2,h3{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing
   <img src="images/trust-badge-2.png" alt="Mercado Pago - Compra 100% segura - Visa, Mastercard, Elo, Pix" class="trust-badge">
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 <script>
 const params = new URLSearchParams(location.search);
 const size = params.get('size') || 'G';
@@ -672,6 +684,88 @@ function updateSummary(){
   document.getElementById('sumTotal').textContent = fmt(productTotal + shippingCost);
 }
 updateSummary();
+
+// ============================================================
+// Gerar Pix real (SimplifyBR) — etapa 3
+// ============================================================
+const finalCta = document.getElementById('finalCta');
+const pixError = document.getElementById('pixError');
+const pixCodeEl = document.getElementById('pixCode');
+const copyPixBtn = document.getElementById('copyPixBtn');
+const pixQrWrap = document.getElementById('pixQrWrap');
+const pixHelpText = document.getElementById('pixHelpText');
+let pixGenerated = false;
+
+function onlyDigits(str){ return (str || '').replace(/\D/g, ''); }
+
+finalCta.addEventListener('click', async function(){
+  if(pixGenerated) return; // evita gerar duplicado depois de já ter um código na tela
+
+  pixError.textContent = '';
+  const name = document.getElementById('f-name').value.trim();
+  const email = document.getElementById('f-email').value.trim();
+  const document_ = onlyDigits(document.getElementById('f-cpf').value);
+  const phone = onlyDigits(document.getElementById('f-phone').value);
+  const productTotal = pixPrice;
+  const totalToPay = +(productTotal + shippingCost).toFixed(2);
+
+  if(!name || !email || !document_ || !phone){
+    pixError.textContent = 'Volte na Etapa 1 e confira seus dados antes de gerar o Pix.';
+    return;
+  }
+
+  finalCta.disabled = true;
+  finalCta.textContent = 'Gerando...';
+
+  try{
+    const resp = await fetch('/api/create-pix', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        amount: totalToPay,
+        payer: { name: name, email: email, document: document_, phone: phone },
+        external_id: 'MANTO-' + Date.now()
+      })
+    });
+    const data = await resp.json();
+
+    if(!resp.ok){
+      pixError.textContent = data.error || 'Não foi possível gerar o Pix agora. Tente novamente em instantes.';
+      finalCta.disabled = false;
+      finalCta.textContent = 'Gerar Pix';
+      return;
+    }
+
+    pixQrWrap.innerHTML = '<canvas id="pixQrCanvas"></canvas>';
+    if(window.QRCode){
+      QRCode.toCanvas(document.getElementById('pixQrCanvas'), data.qrcode, { width: 164, margin: 1 }, function(err){
+        if(err) pixQrWrap.innerHTML = '<span>Não foi possível desenhar o QR — use o código abaixo</span>';
+      });
+    }
+    pixCodeEl.textContent = data.qrcode;
+    pixCodeEl.hidden = false;
+    copyPixBtn.hidden = false;
+    pixHelpText.textContent = 'Escaneie o QR code com o app do seu banco ou copie o código abaixo. Assim que o pagamento for aprovado, você recebe a confirmação por e-mail.';
+
+    finalCta.textContent = 'Pix gerado ✓';
+    pixGenerated = true;
+  }catch(err){
+    pixError.textContent = 'Erro ao conectar com o gateway de pagamento. Verifique sua internet e tente novamente.';
+    finalCta.disabled = false;
+    finalCta.textContent = 'Gerar Pix';
+  }
+});
+
+copyPixBtn.addEventListener('click', function(){
+  navigator.clipboard.writeText(pixCodeEl.textContent).then(function(){
+    copyPixBtn.textContent = 'Código copiado!';
+    copyPixBtn.classList.add('copied');
+    setTimeout(function(){
+      copyPixBtn.textContent = 'Copiar código';
+      copyPixBtn.classList.remove('copied');
+    }, 2200);
+  });
+});
 </script>
 
 </body></html>
